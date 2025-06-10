@@ -7,42 +7,36 @@ use App\Http\Controllers\TasksController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProjectController;
 
-// 1. Tela de Boas-Vindas
+// --- ROTAS PÚBLICAS ---
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
-
-// 2. Telas de Login
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// 3. Telas de Registro
+// A rota de registro principal é para o primeiro admin
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// 4. Tela de Tarefas (Protegida)
-Route::get('/tasks', [TasksController::class, 'index'])->middleware('auth')->name('tasks');
 
-// No final do arquivo routes/web.php
-
-// Rotas para Tasks
-Route::get('/tasks', [TasksController::class, 'index'])->middleware('auth')->name('tasks');
-Route::post('/tasks', [TasksController::class, 'store'])->middleware('auth')->name('tasks.store');
-Route::patch('/tasks/{task}', [TasksController::class, 'update'])->middleware('auth')->name('tasks.update');
-Route::delete('/tasks/{task}', [TasksController::class, 'destroy'])->middleware('auth')->name('tasks.destroy');
+// --- ROTAS PROTEGIDAS APENAS PARA O CLIENTE ---
+Route::middleware('auth')->group(function () {
+    Route::get('/acompanhamento', [ClientController::class, 'dashboard'])->name('acompanhamento');
+});
 
 
+// --- ROTAS PROTEGIDAS APENAS PARA O ADMIN ---
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Dashboard do Admin (Kanban)
+    Route::get('/tasks', [TasksController::class, 'index'])->name('tasks');
 
-// Rotas para Clientes (acessível apenas por admin logado)
-Route::get('/clients/create', [ClientController::class, 'create'])->middleware('auth')->name('clients.create');
-Route::post('/clients', [ClientController::class, 'store'])->middleware('auth')->name('clients.store');
-Route::get('/acompanhamento', [ClientController::class, 'dashboard'])->middleware('auth')->name('acompanhamento');
+    // Gerenciamento de Clientes
+    Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
+    Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
 
-
-// Rotas para Projetos
-Route::get('/projects/create', [ProjectController::class, 'create'])->middleware('auth')->name('projects.create');
-Route::post('/projects', [ProjectController::class, 'store'])->middleware('auth')->name('projects.store');
-Route::patch('/projects/{project}/status', [ProjectController::class, 'updateStatus'])->middleware('auth')->name('projects.updateStatus');
-Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->middleware('auth')->name('projects.destroy');
-
+    // Gerenciamento de Projetos
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::patch('/projects/{project}/status', [ProjectController::class, 'updateStatus'])->name('projects.updateStatus');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+});

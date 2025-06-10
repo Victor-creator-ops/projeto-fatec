@@ -12,18 +12,36 @@ class TasksController extends Controller
     // Exibe o quadro Kanban
     public function index()
     {
-
-        // Pega todos os projetos e seus clientes associados, agrupados por status
-        $projects = Projeto::with('client')->get()->groupBy('status');
-
+        // --- LÓGICA DO KANBAN (JÁ EXISTENTE) ---
+        $allProjects = Projeto::with('client')->get();
+        $projects = $allProjects->groupBy('status');
         $statuses = ['Planejado', 'Em Análise', 'Em Andamento', 'Aguardando Aprovação', 'Finalizado'];
-
         $groupedProjects = [];
         foreach ($statuses as $status) {
             $groupedProjects[$status] = $projects->get($status, collect());
         }
 
-        return view('tasks', ['projectsByStatus' => $groupedProjects, 'statuses' => $statuses]);
+        // --- LÓGICA DO NOVO DASHBOARD ---
+        // 1. Filtra apenas os projetos que não estão finalizados.
+        $openProjects = $allProjects->where('status', '!=', 'Finalizado');
+
+        // 2. Conta quantos projetos estão em aberto.
+        $openProjectsCount = $openProjects->count();
+
+        // 3. Soma o custo total desses projetos.
+        $totalCost = $openProjects->sum('total_cost');
+
+        // 4. Calcula o lucro total (soma de todos os preços - soma de todos os custos).
+        $totalProfit = $openProjects->sum('final_price') - $totalCost;
+
+        // --- ENVIO DOS DADOS PARA A VIEW ---
+        return view('tasks', [
+            'projectsByStatus' => $groupedProjects, // Para o Kanban
+            'statuses' => $statuses,               // Para o Kanban
+            'openProjectsCount' => $openProjectsCount, // Para o Dashboard
+            'totalCost' => $totalCost,             // Para o Dashboard
+            'totalProfit' => $totalProfit,         // Para o Dashboard
+        ]);
     }
 
     // Salva uma nova tarefa

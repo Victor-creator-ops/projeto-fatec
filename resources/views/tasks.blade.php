@@ -59,10 +59,20 @@
                                         {{ 'R$ ' . number_format($project->final_price, 2, ',', '.') }}
                                     </p>
                                 </div>
-                                <button class="delete-project-btn text-red-500 hover:text-red-700 font-bold ml-2 px-2"
-                                    data-project-id="{{ $project->id }}">
-                                    &times;
-                                </button>
+
+                                <div class="flex items-center">
+                                    {{-- Botão Editar --}}
+                                    <a href="{{ route('projects.edit', $project->id) }}"
+                                        class="text-blue-500 hover:text-blue-700 font-bold px-2" title="Editar Projeto">
+                                        ✏️
+                                    </a>
+
+                                    {{-- Botão Excluir --}}
+                                    <button class="delete-project-btn text-red-500 hover:text-red-700 font-bold px-2"
+                                        data-project-id="{{ $project->id }}" title="Excluir Projeto">
+                                        &times;
+                                    </button>
+                                </div>
                             </div>
                         @endforeach
                     </div>

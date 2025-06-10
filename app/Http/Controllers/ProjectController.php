@@ -74,4 +74,51 @@ class ProjectController extends Controller
 
         return response()->json(['message' => 'Projeto excluído com sucesso!']);
     }
+
+    /**
+     * Mostra o formulário para editar um projeto existente.
+     */
+    public function edit(Projeto $project)
+    {
+        // Pega todos os clientes para o dropdown, caso precise mudar o cliente do projeto
+        $clients = User::where('role', 'cliente')->get();
+
+        return view('projects.edit', [
+            'project' => $project,
+            'clients' => $clients,
+        ]);
+    }
+
+    /**
+     * Atualiza o projeto no banco de dados.
+     */
+    public function update(Request $request, Projeto $project)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'client_id' => 'required|exists:users,id',
+            'estimated_hours' => 'required|integer|min:1',
+        ]);
+
+        // Recalcula o custo e preço com base nos novos dados
+        $costPerHour = 50.00;
+        $profitMargin = 0.30;
+        $estimatedHours = $request->estimated_hours;
+        $totalCost = $estimatedHours * $costPerHour;
+        $profit = $totalCost * $profitMargin;
+        $finalPrice = $totalCost + $profit;
+
+        // Atualiza o projeto com os novos dados
+        $project->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'client_id' => $request->client_id,
+            'estimated_hours' => $estimatedHours,
+            'total_cost' => $totalCost,
+            'final_price' => $finalPrice,
+        ]);
+
+        return redirect()->route('tasks')->with('success', 'Projeto atualizado com sucesso!');
+    }
 }

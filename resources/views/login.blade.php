@@ -19,8 +19,6 @@
                 class="w-full px-4 py-2 bg-transparent border-b-2 focus:outline-none">
             <button type="submit" class="w-full bg-blue-600 py-2 rounded-lg hover:bg-blue-700">Entrar</button>
         </form>
-        <p class="mt-6 text-sm text-center text-gray-400">Não tem uma conta? <a href="{{ route('register') }}"
-                class="text-blue-400 hover:underline">Registre-se</a></p>
     </div>
 </body>
 

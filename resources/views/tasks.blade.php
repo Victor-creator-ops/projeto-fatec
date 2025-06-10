@@ -32,6 +32,9 @@
                                 <div class="project-info flex-grow cursor-grab">
                                     <p class="font-semibold">{{ $project->name }}</p>
                                     <p class="text-sm text-gray-600">Cliente: {{ $project->client->name }}</p>
+                                    <p class="text-xs text-green-700 font-bold">Valor:
+                                        {{ 'R$ ' . number_format($project->final_price, 2, ',', '.') }}
+                                    </p>
                                 </div>
                                 <button class="delete-project-btn text-red-500 hover:text-red-700 font-bold ml-2 px-2"
                                     data-project-id="{{ $project->id }}">

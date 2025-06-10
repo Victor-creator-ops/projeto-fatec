@@ -13,6 +13,8 @@
                     <h3 class="font-bold text-lg">{{ $project->name }}</h3>
                     <p class="text-gray-600">{{ $project->description }}</p>
                     <p class="mt-2"><span class="font-semibold">Status:</span> {{ $project->status }}</p>
+                    <p class="mt-1 text-green-700"><span class="font-semibold text-gray-800">Valor:</span>
+                        {{ 'R$ ' . number_format($project->final_price, 2, ',', '.') }}</p>
                 </div>
             @empty
                 <p>Você ainda não tem nenhum projeto associado.</p>
